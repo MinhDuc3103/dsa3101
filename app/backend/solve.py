@@ -100,7 +100,7 @@ def solve_str(solution):
         # print(operators)
         # print(workings)
 
-        statement_lst = []
+        statement_lst = True
         if len(operators) == 0:
             # print('no operators identified')
             return True
@@ -114,9 +114,10 @@ def solve_str(solution):
                 # print(operator)
                 statement = compare_lhs_rhs(left, right, operator)
                 # print( f"The working in statement {i} with regard to {lhs} and {rhs} is {statement}." )
-                statement_lst.append(statement)
+                statement_lst= statement_lst and statement
+                #print(statement_lst,statement)
         # print(statement_lst[0])
-        return statement_lst[0]
+        return statement_lst
 
     except:
         return True

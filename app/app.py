@@ -45,7 +45,7 @@ app.layout = html.Div(
         # Store rubric data per page (assuming that one page = one question)
         dcc.Store(id="page-rubric-data"),
         # Store question/score data per page
-        dcc.Store(id="page-grading-data"),
+        dcc.Store(id="student-num-file-data"),
         # Set of IDs for files that have been marked as completed
         dcc.Store(id="completed-data"),
         dcc.Store(id="rubric-item-edit-final-data"),
@@ -56,4 +56,4 @@ app.layout = html.Div(
 
 if __name__ == "__main__":
     setup_env()
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True)
