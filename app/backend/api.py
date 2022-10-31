@@ -29,7 +29,7 @@ def gglapi_parse(img, enable_solver=False):
         img = np.asarray(img)
     # img in numpy array format
     outputtext, outputImag = google_api_decode(img)
-    font = ImageFont.truetype("backend/arial.ttf", 40)
+    font = ImageFont.truetype("backend/arial.ttf", 20)
     base = Image.open("backend/blank.png").convert("RGBA")
     img = Image.new("RGB", base.size, (255, 255, 255))
     I1 = ImageDraw.Draw(img)

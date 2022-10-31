@@ -286,7 +286,7 @@ layout = html.Div(
                                 variant="light",
                                 style={"width": 400},
                             ),
-                            href="/rubic",
+                            href="/rubric",
                         ),
                         style={
                             "background-color": "rgb(246, 246 ,246)",
