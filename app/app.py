@@ -2,7 +2,6 @@ import dash
 import dash_bootstrap_components as dbc
 from backend.api import setup_env
 from dash import Dash, dcc, html
-import os
 
 external_stylesheets = ["https://rsms.me/inter/inter.css", dbc.themes.BOOTSTRAP]
 

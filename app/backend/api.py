@@ -7,7 +7,6 @@ import PIL
 import wget
 from backend.ggldecode import *
 from backend.solve import *
-import textwrap
 
 
 # if no parser is chosen:
@@ -29,7 +28,7 @@ def gglapi_parse(img, enable_solver=False):
         img = np.asarray(img)
     # img in numpy array format
     outputtext, outputImag = google_api_decode(img)
-    font = ImageFont.truetype("backend/arial.ttf", 40)
+    font = ImageFont.truetype("backend/arial.ttf", 20)
     base = Image.open("backend/blank.png").convert("RGBA")
     img = Image.new("RGB", base.size, (255, 255, 255))
     I1 = ImageDraw.Draw(img)
@@ -37,22 +36,12 @@ def gglapi_parse(img, enable_solver=False):
         counter = 0
         for line in outputtext.splitlines():
             if not solve_str(line):
-                for lin in textwrap.wrap(line, width=100):
-                    I1.text((100, 100 + counter), lin, font=font, fill=(255, 0, 0))
-                    counter += 40
-                #I1.text((100, 100 + counter), line, font=font, fill=(255, 0, 0))
+                I1.text((100, 100 + counter), line, font=font, fill=(255, 0, 0))
             else:
-                for lin in textwrap.wrap(line, width=100):
-                    I1.text((100, 100 + counter), lin, font=font, fill=(0, 0, 0))
-                    counter += 40
-                #I1.text((100, 100 + counter), line, font=font, fill=(0, 0, 0))
+                I1.text((100, 100 + counter), line, font=font, fill=(0, 0, 0))
             counter += 40
     else:
         I1.text((100, 100), outputtext, font=font, fill=(0, 0, 0))
-    # margin = offset = 100
-    # for line in textwrap.wrap(outputtext, width=120):
-    #     I1.text((margin, offset), line, font=font, fill=(0, 0, 0))
-    #     offset += font.getsize(line)[1]
     return np.array(img)
 
 
