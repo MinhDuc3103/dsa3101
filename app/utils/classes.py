@@ -10,4 +10,4 @@ class RubricItem:
     description: str
     item_idx: int
     file_idx: int
-    page_idx: int
+    question_num: int

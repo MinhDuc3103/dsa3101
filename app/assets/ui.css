@@ -15,6 +15,11 @@ input::placeholder {
     font-weight: normal;
 }
 
+.marks-allocation-txt {
+    font-size: 20px;
+    font-weight: bold;
+}
+
 .navbar-link:hover {
     cursor: pointer;
     text-decoration: underline;

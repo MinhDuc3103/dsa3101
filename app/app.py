@@ -2,7 +2,6 @@ import dash
 import dash_bootstrap_components as dbc
 from backend.api import setup_env
 from dash import Dash, dcc, html
-import os
 
 external_stylesheets = ["https://rsms.me/inter/inter.css", dbc.themes.BOOTSTRAP]
 
@@ -45,7 +44,7 @@ app.layout = html.Div(
         # Store rubric data per page (assuming that one page = one question)
         dcc.Store(id="page-rubric-data"),
         # Store question/score data per page
-        dcc.Store(id="page-grading-data"),
+        dcc.Store(id="student-num-file-data"),
         # Set of IDs for files that have been marked as completed
         dcc.Store(id="completed-data"),
         dcc.Store(id="rubric-item-edit-final-data"),

@@ -81,7 +81,17 @@ layout = html.Div(
             color="red",
             duration=5000,
             hide=True,
-            style={"margin-top": "16px"},
+            radius="md",
+            style={"margin": "16px 16px 0px 16px"},
+        ),
+        dmc.Alert(
+            "To get started, upload a script to grade and head to 'Add Rubric' to add a grading scheme!",
+            id="top-hints",
+            title="Getting Started",
+            color="green",
+            duration=8000,
+            radius="md",
+            style={"margin": "16px 16px 0px 16px"},
         ),
         dmc.Group(
             children=[
@@ -89,14 +99,13 @@ layout = html.Div(
                     dcc.Upload(
                         className="upload-button",
                         id="upload-section",
-                        children=html.Div(["Drag and Drop or ", html.A("Select PDF")]),
+                        children=dmc.Button(
+                            "Drag and Drop or Click to select PDF",
+                            style={"height": "60px", "margin-top": "31px"},
+                        ),
                         style={
-                            "width": "1000px",
-                            "height": "60px",
                             "lineHeight": "60px",
                             "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
                             "textAlign": "center",
                             "margin": "10px",
                         },
@@ -177,10 +186,14 @@ layout = html.Div(
                                                     },
                                                     {
                                                         "value": "1",
-                                                        "label": "Google Solver",
+                                                        "label": "Google Parser",
                                                     },
                                                     {
                                                         "value": "2",
+                                                        "label": "Google Parser with Solver",
+                                                    },
+                                                    {
+                                                        "value": "3",
                                                         "label": "Number Highlighter",
                                                     },
                                                 ],
@@ -266,88 +279,15 @@ layout = html.Div(
                 dmc.Col(
                     dmc.Navbar(
                         id="grading-navbar",
-                        children=[
-                            dmc.Group(
-                                children=[
-                                    dmc.Text(
-                                        "Question number: ",
-                                        size="xl",
-                                        weight=800,
-                                    ),
-                                    dmc.TextInput(
-                                        id="page-question-number",
-                                        placeholder="Enter question number",
-                                        type="number",
-                                        required=True,
-                                    ),
-                                ],
-                                direction="column",
-                                position="apart",
-                                style={"padding": "8px 0px 8px 0px"},
+                        children=dcc.Link(
+                            dmc.Button(
+                                "Add Rubric Scheme",
+                                id="add-rubric-scheme-btn",
+                                variant="light",
+                                style={"width": 400},
                             ),
-                            dmc.Group(
-                                children=[
-                                    dmc.Text(
-                                        "Total score:",
-                                        size="xl",
-                                        weight=800,
-                                    ),
-                                    dmc.Group(
-                                        children=[
-                                            dmc.Text(
-                                                "0",
-                                                id="page-current-score",
-                                                size="xl",
-                                                weight=800,
-                                                underline=True,
-                                            ),
-                                            dmc.Text("of", size="xl", weight=800),
-                                            dmc.TextInput(
-                                                id="page-max-score",
-                                                placeholder="Enter max score",
-                                                type="number",
-                                                required=True,
-                                                style={"width": 160},
-                                            ),
-                                        ],
-                                        noWrap=True,
-                                    ),
-                                ],
-                                direction="column",
-                                position="apart",
-                                style={"padding": "8px 0px 8px 0px"},
-                            ),
-                            dmc.Stack(
-                                id="rubric-items-list",
-                                style={"padding": "8px 0px 8px 0px"},
-                            ),
-                            dmc.Group(
-                                id="add-rubric-input",
-                                children=[
-                                    dmc.TextInput(
-                                        id="add-rubric-marks",
-                                        label="Enter marks",
-                                        placeholder="e.g. (-) 1",
-                                        type="number",
-                                        required=True,
-                                    ),
-                                    dmc.TextInput(
-                                        id="add-rubric-description",
-                                        label="Enter rubric description",
-                                        placeholder="e.g. wrong sign used",
-                                        required=True,
-                                    ),
-                                    dmc.Button(
-                                        "Add rubric item",
-                                        id="add-rubric-button",
-                                        variant="light",
-                                    ),
-                                ],
-                                direction="column",
-                                position="apart",
-                                style={"padding": "0px 0px 16px 0px"},
-                            ),
-                        ],
+                            href="/rubic",
+                        ),
                         style={
                             "background-color": "rgb(246, 246 ,246)",
                             "border-radius": "10px",
@@ -397,20 +337,18 @@ def annotate_figure_default_layout() -> dict:
     }
 
 
-def rubric_item_component(marks, desc, item_idx):
-    marks_positive = int(marks) >= 0
-
+def rubric_item_component(marks, desc, item_idx, editable=True):
     return html.Div(
         children=[
             dmc.Group(
                 children=[
                     dmc.Title(
-                        "+" + marks if marks_positive else marks,
+                        "-" + str(marks) if int(marks) > 0 else str(marks),
                         order=3,
                         style={
-                            "color": "rgb(27, 127, 124)"
-                            if marks_positive
-                            else "rgb(192, 33, 33)"
+                            "color": "rgb(192, 33, 33)"
+                            if int(marks) != 0
+                            else "rgb(27, 127, 124)"
                         },
                         id={"type": "rubric-marks", "index": item_idx},
                     ),
@@ -436,7 +374,9 @@ def rubric_item_component(marks, desc, item_idx):
                                 radius="sm",
                                 variant="hover",
                             ),
-                        ],
+                        ]
+                        if editable
+                        else [],
                         align="flex-end",
                         position="right",
                         spacing="xs",
@@ -450,7 +390,7 @@ def rubric_item_component(marks, desc, item_idx):
             ),
         ],
         id={"type": "rubric-item", "index": item_idx},
-        style={"margin": "0px 0px 16px 8px"},
+        style={"margin": "0px 8px 16px 8px"},
     )
 
 
@@ -463,8 +403,10 @@ def render_page_fig(pages, page_idx, parser):
     )[0]
 
     if int(parser) == 1:
-        img = gglapi_parse(img, True)
+        img = gglapi_parse(img, False)
     elif int(parser) == 2:
+        img = gglapi_parse(img, True)
+    elif int(parser) == 3:
         img = num_highlighter(img)
 
     fig = px.imshow(img)
@@ -499,6 +441,118 @@ def process_pdf_upload(file_contents, names, dates):
             )
 
     return uploaded
+
+
+def add_rubric_item(rubric_data, file_idx, question_num, item_idx, marks, description):
+    marks = -abs(int(marks.strip()))
+    new_item = RubricItem(marks, description.strip(), item_idx, file_idx, question_num)
+
+    # Note: dcc.Store data are JSON-serialized, and Python converts integer
+    # keys to strings
+    # To avoid surprises, just using string keys throughout
+    file_idx = str(file_idx)
+    question_num = str(question_num)
+    if rubric_data:
+        if file_idx in rubric_data:
+            if question_num in rubric_data[file_idx]:
+                rubric_data[file_idx][question_num].append(new_item)
+            else:
+                rubric_data[file_idx][question_num] = [new_item]
+        else:
+            rubric_data |= {file_idx: {question_num: [new_item]}}
+    else:
+        rubric_data = {file_idx: {question_num: [new_item]}}
+
+    return rubric_data
+
+
+def delete_rubric_item(rubric_data, file_idx, question_num, item_idx):
+    # Note: dcc.Store data are JSON-serialized, and Python converts integer
+    # keys to strings
+    # To avoid surprises, just using string keys throughout
+    file_idx = str(file_idx)
+    question_num = str(question_num)
+    rubric_data[file_idx][question_num] = [
+        item
+        for item in rubric_data[file_idx][question_num]
+        if RubricItem.from_dict(item).item_idx != item_idx
+    ]
+
+    return rubric_data
+
+
+def retrieve_file_student_num(student_num_file_map, file_idx):
+    # Note: dcc.Store data are JSON-serialized, and Python # converts integer
+    # keys to strings
+    # To avoid surprises, just using string keys throughout
+    file_idx = str(file_idx)
+
+    if not student_num_file_map or file_idx not in student_num_file_map:
+        return ""
+
+    return student_num_file_map[file_idx]
+
+
+def mark_file_as_completed(completed_data, file_idx):
+    file_idx = str(file_idx)
+    if completed_data:
+        completed_data[file_idx] = 1
+    else:
+        completed_data = {file_idx: 1}
+
+    return completed_data
+
+
+def generate_rubric_match_modal_children(
+    edit_data, edit_student_num, edit_question_num, student_num_file_map
+):
+    rubric_desc = edit_data["new"][0]["description"]
+    rubric_old_marks = edit_data["original_marks"]
+    rubric_new_marks = edit_data["new"][0]["marks"]
+
+    list_items = []
+    for item in edit_data["matched_rubric_items"]:
+        rubric_item = RubricItem.from_dict(item)
+        student_num = student_num_file_map[str(rubric_item.file_idx)]
+        question_num = rubric_item.question_num
+
+        list_items.append((student_num, question_num))
+
+    children = (
+        [
+            dmc.Text(
+                "There are matching rubric items found in other scripts. Apply edits to them as well?"
+            ),
+            dmc.Space(h=20),
+            dcc.Markdown(
+                f"""
+                Changing rubric item **'{rubric_desc}'** marks from **{rubric_old_marks}** to **{rubric_new_marks}**:
+                - Student {edit_student_num}, Question {edit_question_num} **(current edit)**
+                """,
+                id="current-edit-md",
+            ),
+            dcc.Markdown(
+                "\n".join(
+                    f"- Student {student_num}, Question {question_num}"
+                    for student_num, question_num in list_items
+                ),
+                style={"margin-top": "0px"},
+            ),
+            dmc.Space(h=10),
+            dcc.Markdown(
+                f"""
+                Options:
+                - **Apply to all questions**: This change will be applied across all scripts for matching criteria across all questions.
+                - **Apply to current question only**: This change will be applied across all scripts, only for Question {edit_question_num}
+                - **Apply current edit only**: This change will only be applied for the current script, only for Question {edit_question_num}
+                """
+            ),
+            dmc.Space(h=20),
+        ]
+        + RUBRIC_MATCH_MODAL_DEFAULT_CHILDREN
+    )
+
+    return children
 
 
 @callback(
@@ -707,14 +761,125 @@ def update_navbar(files_data, completed_data, path):
 
 
 @callback(
+    Output("grading-navbar", "children"),
+    [
+        Input("rubric-scheme-data", "data"),
+        Input("_pages_location", "pathname"),
+    ],
+)
+def populate_grading_navbar(rubric_scheme_data, path):
+    if path != dash.page_registry["pages.home"]["path"] or not rubric_scheme_data:
+        return dash.no_update
+
+    return [
+        dmc.Select(
+            label="Question Number",
+            id="question-grade-select",
+            value="1",
+            data=[
+                {"value": i, "label": i} for i in rubric_scheme_data["questions"].keys()
+            ],
+            maxDropdownHeight=200,
+            radius="md",
+            size="lg",
+            style={"margin-bottom": "16px", "width": 250},
+        ),
+        dmc.Group(
+            children=[
+                dmc.Group(
+                    children=[
+                        dmc.Text(
+                            "Total score:",
+                            size="xl",
+                            weight=800,
+                        ),
+                        dmc.Text(
+                            id="question-current-score",
+                            size="xl",
+                            weight=800,
+                            underline=True,
+                        ),
+                        dmc.Text(
+                            "of",
+                            size="xl",
+                            weight=800,
+                        ),
+                        dmc.Text(
+                            rubric_scheme_data["questions"]["1"],
+                            id="question-total-score",
+                            size="xl",
+                            weight=800,
+                        ),
+                    ],
+                    noWrap=True,
+                ),
+            ],
+            direction="column",
+            position="apart",
+            style={"padding": "8px 0px 8px 0px"},
+        ),
+        dmc.Stack(
+            children=[rubric_item_component(0, "Correct", 0, False)],
+            id="rubric-items-list",
+            style={"padding": "8px 0px 8px 0px"},
+        ),
+        dmc.Group(
+            id="add-rubric-input",
+            children=[
+                dmc.TextInput(
+                    id="add-rubric-marks",
+                    label="Enter marks deduction",
+                    placeholder="e.g. (-) 1",
+                    type="number",
+                    required=True,
+                ),
+                dmc.TextInput(
+                    id="add-rubric-description",
+                    label="Enter rubric description",
+                    placeholder="e.g. wrong sign used",
+                    required=True,
+                ),
+                dmc.Button(
+                    "Add rubric item",
+                    id="add-rubric-button",
+                    variant="light",
+                ),
+            ],
+            direction="column",
+            position="apart",
+            style={"padding": "0px 0px 16px 0px"},
+        ),
+    ]
+
+
+@callback(
+    Output("question-total-score", "children"),
+    Input("question-grade-select", "value"),
+    State("rubric-scheme-data", "data"),
+)
+def update_total_score_display(question_num, rubric_scheme):
+    if not question_num or not rubric_scheme:
+        return dash.no_update
+
+    return rubric_scheme["questions"][question_num]
+
+
+@callback(
+    Output("question-grade-select", "value"),
+    Input("file-index", "data"),
+    prevent_initial_call=True,
+)
+def reset_selected_question_number(_file_idx):
+    return "1"
+
+
+@callback(
     [
         Output("page-rubric-data", "data"),
         Output("add-rubric-marks", "value"),
         Output("add-rubric-description", "value"),
         Output("add-rubric-marks", "error"),
         Output("add-rubric-description", "error"),
-        Output("page-question-number", "error"),
-        Output("page-max-score", "error"),
     ],
     [
         Input("add-rubric-button", "n_clicks"),
@@ -725,10 +890,8 @@ def update_navbar(files_data, completed_data, path):
         State("add-rubric-marks", "value"),
         State("add-rubric-description", "value"),
         State("page-rubric-data", "data"),
-        State("page-index", "data"),
         State("file-index", "data"),
-        State("page-question-number", "value"),
-        State("page-max-score", "value"),
+        State("question-grade-select", "value"),
     ],
     prevent_initial_call=True,
 )
@@ -739,15 +902,11 @@ def update_rubric_items(
     marks,
     description,
     rubric_data,
-    page_idx,
     file_idx,
     question_num,
-    total_score,
 ):
     if ctx.triggered_id == "add-rubric-button" and add_n_clicks:
-        marks_err, description_err, question_num_err, total_score_err = (
-            "",
-            "",
+        marks_err, description_err = (
             "",
             "",
         )
@@ -758,29 +917,19 @@ def update_rubric_items(
         if not description:
             description_err = "Rubric description cannot be empty"
 
-        if not question_num:
-            question_num_err = "Question number required"
-
-        if not total_score:
-            total_score_err = "Total score required"
-
-        if any((marks_err, description_err, question_num_err, total_score_err)):
+        if marks_err or description_err:
             return (
                 dash.no_update,
                 dash.no_update,
                 dash.no_update,
                 marks_err,
                 description_err,
-                question_num_err,
-                total_score_err,
             )
 
         return (
             add_rubric_item(
-                rubric_data, page_idx, file_idx, add_n_clicks, marks, description
+                rubric_data, file_idx, question_num, add_n_clicks, marks, description
             ),
-            "",
-            "",
             "",
             "",
             "",
@@ -802,11 +951,11 @@ def update_rubric_items(
             return dash.no_update
 
         return (
-            delete_rubric_item(rubric_data, page_idx, file_idx, ctx.triggered_id.index),
+            delete_rubric_item(
+                rubric_data, file_idx, question_num, ctx.triggered_id.index
+            ),
             dash.no_update,
             dash.no_update,
-            "",
-            "",
             "",
             "",
         )
@@ -817,7 +966,7 @@ def update_rubric_items(
         for edit in edit_data["new"]:
             new_rubric_item = RubricItem.from_dict(edit)
             for item in rubric_data[str(new_rubric_item.file_idx)][
-                str(new_rubric_item.page_idx)
+                str(new_rubric_item.question_num)
             ]:
                 if item["item_idx"] == new_rubric_item.item_idx:
                     item["marks"] = new_rubric_item.marks
@@ -826,8 +975,6 @@ def update_rubric_items(
 
         return (
             rubric_data,
-            dash.no_update,
-            dash.no_update,
             dash.no_update,
             dash.no_update,
             dash.no_update,
@@ -902,7 +1049,7 @@ def edit_rubric_item(edit_n_clicks, rubric_marks, rubric_desc):
         State({"type": "rubric-desc-edit", "index": MATCH}, "placeholder"),
         State("page-rubric-data", "data"),
         State("file-index", "data"),
-        State("page-index", "data"),
+        State("question-grade-select", "value"),
     ],
     prevent_initial_call=True,
 )
@@ -914,7 +1061,7 @@ def finish_edit_rubric_item(
     rubric_desc_original,
     rubric_data,
     file_idx,
-    page_idx,
+    question_num,
 ):
     if not done_n_clicks or (
         isinstance(done_n_clicks, Iterable) and not any(done_n_clicks)
@@ -928,7 +1075,7 @@ def finish_edit_rubric_item(
                 rubric_desc_edited,
                 ctx.triggered_id.index,
                 file_idx,
-                page_idx,
+                question_num,
             )
         ]
     }
@@ -940,19 +1087,19 @@ def finish_edit_rubric_item(
         return edits
 
     file_idx = str(file_idx)
-    page_idx = str(page_idx)
+    question_num = str(question_num)
     # Find matching rubric items across all files and pages
     matched_rubric_items = []
     for f_idx, pages in rubric_data.items():
-        for p_idx, rubric_items in pages.items():
+        for q_num, rubric_items in pages.items():
             for item in rubric_items:
                 item = RubricItem.from_dict(item)
                 # We stored the original value of the edited description in the
                 # placeholder in `edit_rubric_item`
                 if (
                     item.description == rubric_desc_original
-                    and item.marks == rubric_marks_original
-                    and not (str(f_idx) == file_idx and str(p_idx) == page_idx)
+                    and int(item.marks) == int(rubric_marks_original)
+                    and not (str(f_idx) == file_idx and str(q_num) == question_num)
                 ):
                     matched_rubric_items.append(item)
 
@@ -977,11 +1124,21 @@ def finish_edit_rubric_item(
         Input("rubric-match-modal-current-btn", "n_clicks"),
         Input({"type": "rubric-item-edit-data", "index": ALL}, "data"),
     ],
-    [State("page-grading-data", "data")],
+    [
+        State("student-number-input", "value"),
+        State("question-grade-select", "value"),
+        State("student-num-file-data", "data"),
+    ],
     prevent_initial_call=True,
 )
 def handle_matching_rubric_items_modal(
-    all_btn, current_qns_btn, current_btn, edit_data, grading_data
+    all_btn,
+    current_qns_btn,
+    current_btn,
+    edit_data,
+    student_num,
+    question_num,
+    student_num_file_map,
 ):
     # Property of pattern matching callback: since we match on ALL indexes,
     # Dash automatically assumes that we have more than one trigger source
@@ -1006,7 +1163,7 @@ def handle_matching_rubric_items_modal(
             edit_data["new"].append(
                 RubricItem(
                     new_marks,
-                    *attrgetter("description", "item_idx", "file_idx", "page_idx")(
+                    *attrgetter("description", "item_idx", "file_idx", "question_num")(
                         rubric_item
                     ),
                 )
@@ -1015,24 +1172,16 @@ def handle_matching_rubric_items_modal(
         return dash.no_update, False, edit_data
     elif ctx.triggered_id == "rubric-match-modal-current-qns-btn" and current_qns_btn:
         new_marks = edit_data["new"][0]["marks"]
-        current_question_num = grading_data[str(edit_data["new"][0]["file_idx"])][
-            str(edit_data["new"][0]["page_idx"])
-        ]["question_num"]
 
         for item in edit_data["matched_rubric_items"]:
             rubric_item = RubricItem.from_dict(item)
-            if (
-                grading_data[str(rubric_item.file_idx)][str(rubric_item.page_idx)][
-                    "question_num"
-                ]
-                != current_question_num
-            ):
+            if int(rubric_item.question_num) != int(question_num):
                 continue
 
             edit_data["new"].append(
                 RubricItem(
                     new_marks,
-                    *attrgetter("description", "item_idx", "file_idx", "page_idx")(
+                    *attrgetter("description", "item_idx", "file_idx", "question_num")(
                         rubric_item
                     ),
                 )
@@ -1041,7 +1190,9 @@ def handle_matching_rubric_items_modal(
         return dash.no_update, False, edit_data
 
     return (
-        generate_rubric_match_modal_children(edit_data, grading_data),
+        generate_rubric_match_modal_children(
+            edit_data, student_num, question_num, student_num_file_map
+        ),
         True,
         dash.no_update,
     )
@@ -1051,21 +1202,25 @@ def handle_matching_rubric_items_modal(
     Output("rubric-items-list", "children"),
     [
         Input("page-rubric-data", "data"),
-        Input("page-index", "data"),
         Input("file-index", "data"),
+        Input("question-grade-select", "value"),
     ],
     prevent_initial_call=True,
 )
-def render_rubric_items(rubric_data, page_idx, file_idx):
+def render_rubric_items(rubric_data, file_idx, question_num):
     # Note: dcc.Store data are JSON-serialized, and Python converts integer
     # keys to strings
     # To avoid surprises, just using string keys throughout
-    page_idx = str(page_idx)
     file_idx = str(file_idx)
+    question_num = str(question_num)
 
-    items = []
-    if rubric_data and file_idx in rubric_data and page_idx in rubric_data[file_idx]:
-        for item in rubric_data[file_idx][page_idx]:
+    items = [rubric_item_component(0, "Correct", 0, False)]
+    if (
+        rubric_data
+        and file_idx in rubric_data
+        and question_num in rubric_data[file_idx]
+    ):
+        for item in rubric_data[file_idx][question_num]:
             item = RubricItem.from_dict(item)
             items.append(
                 rubric_item_component(item.marks, item.description, item.item_idx)
@@ -1075,11 +1230,19 @@ def render_rubric_items(rubric_data, page_idx, file_idx):
 
 
 @callback(
-    [Output("page-current-score", "children"), Output("page-current-score", "color")],
-    [Input("rubric-items-list", "children")],
+    [
+        Output("question-current-score", "children"),
+        Output("question-current-score", "color"),
+    ],
+    [
+        Input("rubric-items-list", "children"),
+        State("rubric-scheme-data", "data"),
+        State("question-grade-select", "value"),
+    ],
     prevent_initial_call=True,
 )
-def update_current_score(rubric_items):
+def update_current_score(rubric_items, rubric_scheme, question_num):
+    total_score = rubric_scheme["questions"][question_num]
     scores = [
         int(
             item["props"]["children"][0]["props"]["children"][0]["props"][
@@ -1088,55 +1251,24 @@ def update_current_score(rubric_items):
         )
         for item in rubric_items
     ]
-    score = sum(scores)
+    # Scores will be enforced to be negative
+    score = total_score + sum(scores)
 
     return score, "dark" if score >= 0 else "red"
 
 
 @callback(
-    [
-        Output("page-question-number", "value"),
-        Output("page-max-score", "value"),
-    ],
-    [
-        Input("page-index", "data"),
-        Input("file-index", "data"),
-    ],
-    State("page-grading-data", "data"),
-)
-def render_grading_fields(page_idx, file_idx, grading_data):
-    if not grading_data or file_idx is None or page_idx is None:
-        return dash.no_update
-
-    file_idx = str(file_idx)
-    page_idx = str(page_idx)
-    if file_idx not in grading_data or page_idx not in grading_data[file_idx]:
-        return "", ""
-
-    return (
-        grading_data[file_idx][page_idx]["question_num"] or "",
-        grading_data[file_idx][page_idx]["total_score"] or "",
-    )
-
-
-@callback(
-    Output("page-grading-data", "data"),
+    Output("student-num-file-data", "data"),
     [
         Input("student-number-input", "value"),
-        Input("page-question-number", "value"),
-        Input("page-max-score", "value"),
         Input("upload-store", "data"),
     ],
     [
-        State("page-grading-data", "data"),
-        State("page-index", "data"),
+        State("student-num-file-data", "data"),
         State("file-index", "data"),
     ],
-    prevent_initial_call=True,
 )
-def update_grading_data(
-    student_num, question_num, total_score, files, grading_data, page_idx, file_idx
-):
+def update_student_file_map(student_num, files, student_num_file_map, file_idx):
     # Perform one-time population of student number, if can be extracted from
     # uploaded filenames
     if ctx.triggered_id == "upload-store":
@@ -1146,47 +1278,16 @@ def update_grading_data(
             sn_match = re.search(STUDENT_NUM_REGEX, file["name"])
             if sn_match:
                 data[file_idx] = {}
-                data[file_idx]["student_num"] = sn_match.group(1).upper()
+                data[file_idx] = sn_match.group(1).upper()
 
         return data
 
-    if not any((student_num, question_num, total_score)):
+    if not student_num or not file_idx:
         return dash.no_update
 
-    file_idx = str(file_idx)
-    page_idx = str(page_idx)
+    student_num_file_map[file_idx] = student_num
 
-    if grading_data:
-        if file_idx in grading_data:
-            grading_data[file_idx]["student_num"] = student_num
-
-            if page_idx in grading_data[file_idx]:
-                grading_data[file_idx][page_idx]["question_num"] = question_num
-                grading_data[file_idx][page_idx]["total_score"] = total_score
-            else:
-                grading_data[file_idx][page_idx] = {
-                    "question_num": question_num,
-                    "total_score": total_score,
-                }
-        else:
-            grading_data |= {
-                file_idx: {
-                    "student_num": student_num,
-                    page_idx: {
-                        "question_num": question_num,
-                        "total_score": total_score,
-                    },
-                }
-            }
-    else:
-        grading_data = {
-            file_idx: {
-                "student_num": student_num,
-                page_idx: {"question_num": question_num, "total_score": total_score},
-            }
-        }
-
-    return grading_data
+    return student_num_file_map
 
 
 @callback(
@@ -1206,7 +1307,7 @@ def update_grading_data(
     [
         State("upload-store", "data"),
         State("student-number-input", "value"),
-        State("page-grading-data", "data"),
+        State("student-num-file-data", "data"),
         State("completed-data", "data"),
     ],
     prevent_initial_call=True,
@@ -1218,7 +1319,7 @@ def modify_grading_fields(
     file_idx,
     files,
     student_num,
-    grading_data,
+    student_num_file_map,
     completed_data,
 ):
     # TODO: cleanup input/output arguments
@@ -1241,7 +1342,7 @@ def modify_grading_fields(
     elif ctx.triggered_id == "file-index":
         return (
             "",
-            retrieve_file_student_num(grading_data, file_idx),
+            retrieve_file_student_num(student_num_file_map, file_idx),
             dash.no_update,
             False,
             dash.no_update,
@@ -1292,28 +1393,26 @@ def modify_grading_fields(
     ],
     Input("export-grading-pdf-btn", "n_clicks"),
     [
-        State("page-grading-data", "data"),
+        State("student-num-file-data", "data"),
         State("page-rubric-data", "data"),
         State("file-index", "data"),
-        State("page-index", "data"),
+        State("rubric-scheme-data", "data"),
     ],
     prevent_initial_call=True,
 )
 def export_grading_to_pdf(
-    export_btn_clicks, grading_data, rubric_data, file_idx, page_idx
+    export_btn_clicks,
+    student_num_file_map,
+    rubric_data,
+    file_idx,
+    rubric_scheme_data,
 ):
     file_idx = str(file_idx)
-    page_idx = str(page_idx)
 
     err = (
-        not grading_data
-        or (file_idx is not None and file_idx not in grading_data)
-        or (page_idx is not None and page_idx not in grading_data[file_idx])
-    ) or (
-        not rubric_data
-        or (file_idx is not None and file_idx not in rubric_data)
-        or (page_idx is not None and page_idx not in rubric_data[file_idx])
-    )
+        not student_num_file_map
+        or (file_idx is not None and file_idx not in student_num_file_map)
+    ) or (not rubric_data or (file_idx is not None and file_idx not in rubric_data))
 
     if err:
         return (
@@ -1326,8 +1425,10 @@ def export_grading_to_pdf(
         return dash.no_update
 
     # Compute score breakdown
-    student_num = grading_data[file_idx]["student_num"]
-    questions_marks = marks_by_question(rubric_data, grading_data, student_num)
+    student_num = student_num_file_map[file_idx]
+    questions_marks = marks_by_question(
+        rubric_data, rubric_scheme_data, student_num_file_map, student_num
+    )
 
     def _main_page(canvas, doc):
         PAGE_WIDTH, PAGE_HEIGHT = defaultPageSize[0:2]
@@ -1367,13 +1468,13 @@ def export_grading_to_pdf(
 
             comments = [Paragraph("Comments:", style)]
             comments_sub = []
-            for page_idx, rubric_items in rubric_data[file_idx].items():
-                page = int(page_idx) + 1
-                if page != question:
+            for question_num, rubric_items in rubric_data[file_idx].items():
+                q_num = int(question_num)
+                if q_num != question:
                     continue
 
-                comments_sub.append(
-                    f"Page {page}: {', '.join(item['description'] for item in rubric_items)}"
+                comments_sub.extend(
+                    f"{item['description']} ({item['marks']})" for item in rubric_items
                 )
 
             comments.append(
@@ -1404,124 +1505,3 @@ def export_grading_to_pdf(
             dash.no_update,
             dash.no_update,
         )
-
-
-def add_rubric_item(rubric_data, page_idx, file_idx, item_idx, marks, description):
-    new_item = RubricItem(
-        marks.strip(), description.strip(), item_idx, file_idx, page_idx
-    )
-
-    # Note: dcc.Store data are JSON-serialized, and Python converts integer
-    # keys to strings
-    # To avoid surprises, just using string keys throughout
-    file_idx = str(file_idx)
-    page_idx = str(page_idx)
-    if rubric_data:
-        if file_idx in rubric_data:
-            if page_idx in rubric_data[file_idx]:
-                rubric_data[file_idx][page_idx].append(new_item)
-            else:
-                rubric_data[file_idx][page_idx] = [new_item]
-        else:
-            rubric_data |= {file_idx: {page_idx: [new_item]}}
-    else:
-        rubric_data = {file_idx: {page_idx: [new_item]}}
-
-    return rubric_data
-
-
-def delete_rubric_item(rubric_data, page_idx, file_idx, item_idx):
-    # Note: dcc.Store data are JSON-serialized, and Python converts integer
-    # keys to strings
-    # To avoid surprises, just using string keys throughout
-    file_idx = str(file_idx)
-    page_idx = str(page_idx)
-    rubric_data[file_idx][page_idx] = [
-        item
-        for item in rubric_data[file_idx][page_idx]
-        if RubricItem.from_dict(item).item_idx != item_idx
-    ]
-
-    return rubric_data
-
-
-def retrieve_file_student_num(grading_data, file_idx):
-    # Note: dcc.Store data are JSON-serialized, and Python # converts integer
-    # keys to strings
-    # To avoid surprises, just using string keys throughout
-    file_idx = str(file_idx)
-
-    if not grading_data or file_idx not in grading_data:
-        return ""
-
-    return (
-        grading_data[file_idx]["student_num"]
-        if "student_num" in grading_data[file_idx]
-        else ""
-    )
-
-
-def mark_file_as_completed(completed_data, file_idx):
-    file_idx = str(file_idx)
-    if completed_data:
-        completed_data[file_idx] = 1
-    else:
-        completed_data = {file_idx: 1}
-
-    return completed_data
-
-
-def generate_rubric_match_modal_children(edit_data, grading_data):
-    rubric_desc = edit_data["new"][0]["description"]
-    rubric_old_marks = edit_data["original_marks"]
-    rubric_new_marks = edit_data["new"][0]["marks"]
-    edit_student_num = grading_data[str(edit_data["new"][0]["file_idx"])]["student_num"]
-    edit_question_num = grading_data[str(edit_data["new"][0]["file_idx"])][
-        str(edit_data["new"][0]["page_idx"])
-    ]["question_num"]
-
-    list_items = []
-    for item in edit_data["matched_rubric_items"]:
-        rubric_item = RubricItem.from_dict(item)
-        student_num = grading_data[str(rubric_item.file_idx)]["student_num"]
-        question_num = grading_data[str(rubric_item.file_idx)][
-            str(rubric_item.page_idx)
-        ]["question_num"]
-
-        list_items.append((student_num, question_num))
-
-    children = (
-        [
-            dmc.Text(
-                "There are matching rubric items found in other scripts. Apply edits to them as well?"
-            ),
-            dmc.Space(h=20),
-            dcc.Markdown(
-                f"""
-                Changing rubric item **'{rubric_desc}'** marks from **{rubric_old_marks}** to **{rubric_new_marks}**:
-                - Student {edit_student_num}, Question {edit_question_num} **(current edit)**
-                """,
-                id="current-edit-md",
-            ),
-            dcc.Markdown(
-                "\n".join(
-                    f"- Student {student_num}, Question {question_num}"
-                    for student_num, question_num in list_items
-                ),
-                style={"margin-top": "0px"},
-            ),
-            dmc.Space(h=10),
-            dcc.Markdown(
-                f"""
-                Options:
-                - **Apply to all questions**: This change will be applied across all scripts for matching criteria across all questions.
-                - **Apply to current question only**: This change will be applied across all scripts, only for Question {edit_question_num}
-                - **Apply current edit only**: This change will only be applied for the current script, only for Question {edit_question_num}
-                """
-            ),
-            dmc.Space(h=20),
-        ]
-        + RUBRIC_MATCH_MODAL_DEFAULT_CHILDREN
-    )
-
-    return children
