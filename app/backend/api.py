@@ -7,6 +7,7 @@ import PIL
 import wget
 from backend.ggldecode import *
 from backend.solve import *
+import textwrap
 
 
 # if no parser is chosen:
@@ -36,9 +37,15 @@ def gglapi_parse(img, enable_solver=False):
         counter = 0
         for line in outputtext.splitlines():
             if not solve_str(line):
-                I1.text((100, 100 + counter), line, font=font, fill=(255, 0, 0))
+                for lin in textwrap.wrap(line, width=100):
+                    I1.text((100, 100 + counter), lin, font=font, fill=(255, 0, 0))
+                    counter += 40
+                #I1.text((100, 100 + counter), line, font=font, fill=(255, 0, 0))
             else:
-                I1.text((100, 100 + counter), line, font=font, fill=(0, 0, 0))
+                for lin in textwrap.wrap(line, width=100):
+                    I1.text((100, 100 + counter), lin, font=font, fill=(0, 0, 0))
+                    counter += 40
+                #I1.text((100, 100 + counter), line, font=font, fill=(0, 0, 0))
             counter += 40
     else:
         I1.text((100, 100), outputtext, font=font, fill=(0, 0, 0))
