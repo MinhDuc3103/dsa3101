@@ -48,7 +48,12 @@ def gglapi_parse(img, enable_solver=False):
                 #I1.text((100, 100 + counter), line, font=font, fill=(0, 0, 0))
             counter += 40
     else:
-        I1.text((100, 100), outputtext, font=font, fill=(0, 0, 0))
+        counter = 0
+        for line in outputtext.splitlines():
+            for lin in textwrap.wrap(line, width=100):
+                    I1.text((100, 100 + counter), lin, font=font, fill=(0, 0, 0))
+                    counter += 40
+            counter += 40
     return np.array(img)
 
 
