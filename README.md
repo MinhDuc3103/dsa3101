@@ -33,3 +33,8 @@ Expressions. This repository contains code for one of the entries for the 2014
 competition. (Look for others!) 
 4. Although the data is provided in pdf format, this is not ideal, and you may want to use some 
 other language/software that captures the order of the strokes e.g MathML or Xournal++ 
+
+Demo video
+Demo video showing how the parsers work.
+
+[demo-vid-compressed.zip](https://github.com/Khanseem/dsa3101-2210-12-math/files/9926872/demo-vid-compressed.zip)
