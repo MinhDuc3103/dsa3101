@@ -22,7 +22,10 @@ def simplify_latex(tex):
 
 def simplify_str(s):
     # print(f"{s} evaluates to {ne.evaluate(s)} ")
-    return ne.evaluate(s)
+    try:
+        return ne.evaluate(s.strip())
+    except:
+        return "Invalid"
 
 
 def compare_lhs_rhs(left, right, operator):
@@ -76,14 +79,13 @@ def solve_str(solution):
             letters = letters[1:]
         while letters[-1] in operator_lst:
             letters = letters[:-1]
+
         for letter in letters:
-            # print(letter)
             if letter in operator_lst:
                 if current_string == []:
                     # if the current string is empty, assume that the previous iteration ran added an operator to operator list
                     operator = operators.pop()
                     operator = "".join([operator, letter])
-                    # print(operator)
                     operators.append(operator)
                 else:
                     # if the current string is not empty, then we add the string to the strings and reset teh string and add the operator
@@ -111,14 +113,19 @@ def solve_str(solution):
                 left = simplify_str(lhs)
                 right = simplify_str(rhs)
                 operator = operators[i]
+                # print(rhs, lhs, left, right, operator)
                 # print(operator)
-                statement = compare_lhs_rhs(left, right, operator)
+                if left == "invalid" or right == "invalid":
+                    statement = True
+                else:
+                    statement = compare_lhs_rhs(left, right, operator)
                 # print( f"The working in statement {i} with regard to {lhs} and {rhs} is {statement}." )
                 statement_lst= statement_lst and statement
                 #print(statement_lst,statement)
         # print(statement_lst[0])
         return statement_lst
 
+    # except Exception as e: print(e)
     except:
         return True
 
@@ -190,8 +197,8 @@ def solve_latex(solution):
 """
 
 
-str_solution = "90=20<=30="
-solve_str(str_solution)
+# str_solution = "p ( A ) = 0.3 + 0.2 = 0.7"
+# print(solve_str(str_solution))
 # except ZeroDivisionError as err:
 #     print('Handling run-time error:', err)
 

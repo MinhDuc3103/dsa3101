@@ -286,7 +286,7 @@ layout = html.Div(
                                 variant="light",
                                 style={"width": 400},
                             ),
-                            href="/rubric",
+                            href="/rubric", # href=dash.page_registry["pages.rubric"]["relative_path"]
                         ),
                         style={
                             "background-color": "rgb(246, 246 ,246)",
